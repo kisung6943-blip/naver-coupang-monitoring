@@ -796,7 +796,7 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
-    showToast("백업 파일이 내보내기 되었습니다.");
+    showToast("데이터 파일이 정상적으로 저장되었습니다.");
   };
 
   // Import database from JSON file
@@ -816,7 +816,7 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
             if (prodWithKw && (!selectedProduct?.keywords || !selectedProduct.keywords.some(k => k))) {
               setSelectedProductId(prodWithKw.id);
             }
-            showToast("백업 데이터가 성공적으로 복구되었습니다!");
+            showToast("데이터를 성공적으로 가져왔습니다!");
           } else {
             showToast("올바른 백업 형식이 아닙니다.", "error");
           }
@@ -910,12 +910,12 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
             <div className="flex items-center gap-1.5">
               <button 
                 onClick={handleExportData}
-                title="데이터 백업 받기"
+                title="데이터 파일로 저장하기"
                 className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 text-sm font-medium flex items-center gap-1.5 transition-colors"
                 id="btn-export"
               >
                 <Download size={15} />
-                <span className="hidden sm:inline">백업 추출</span>
+                <span className="hidden sm:inline">데이터 저장</span>
               </button>
               
               <label 
@@ -923,7 +923,7 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
                 id="label-import"
               >
                 <Upload size={15} />
-                <span className="hidden sm:inline">백업 복구</span>
+                <span className="hidden sm:inline">데이터 가져오기</span>
                 <input 
                   type="file" 
                   accept=".json" 
