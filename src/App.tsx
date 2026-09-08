@@ -3,7 +3,7 @@ import {
   Search, Plus, Trash2, Edit2, Sparkles, LineChart as ChartIcon, 
   Calendar, ArrowUpDown, TrendingDown, TrendingUp, CheckCircle, 
   ExternalLink, FileSpreadsheet, Download, Upload, Info, AlertTriangle, 
-  RefreshCw, Layers, Check, X, HelpCircle, ChevronUp, ChevronDown
+  RefreshCw, Layers, Check, X, HelpCircle, ChevronUp, ChevronDown, Copy
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -801,6 +801,19 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
     showToast("품목 순서가 변경되었습니다.");
   };
 
+  // Helper to copy URL to clipboard
+  const handleCopyUrl = (url: string, label: string) => {
+    if (!url) {
+      showToast(`${label} 주소가 설정되지 않았습니다.`, "error");
+      return;
+    }
+    navigator.clipboard.writeText(url).then(() => {
+      showToast(`${label} 주소가 클립보드에 복사되었습니다!`);
+    }).catch(() => {
+      showToast("복사 중 오류가 발생했습니다.", "error");
+    });
+  };
+
   // Export database as JSON
   const handleExportData = () => {
     const dataStr = JSON.stringify({ products, priceLogs }, null, 2);
@@ -1192,15 +1205,25 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
                                     title="네이버 쇼핑 URL 붙여넣기"
                                   />
                                   {item.naverUrl && (
-                                    <a 
-                                      href={item.naverUrl} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer" 
-                                      className="text-amber-700 hover:text-amber-900 font-bold underline flex items-center gap-0.5 text-[10px]"
-                                      title="새 창으로 네이버 열기"
-                                    >
-                                      열기<ExternalLink size={8} />
-                                    </a>
+                                    <div className="flex items-center gap-1 border-l border-amber-200/80 pl-1 ml-0.5">
+                                      <button
+                                        onClick={() => handleCopyUrl(item.naverUrl!, "네이버")}
+                                        className="text-amber-800 hover:text-amber-950 font-semibold flex items-center gap-0.5 text-[10px] bg-amber-100/70 hover:bg-amber-200/80 px-1 py-0.5 rounded transition-colors"
+                                        title="네이버 주소 복사하기"
+                                      >
+                                        <Copy size={9} />
+                                        <span>복사</span>
+                                      </button>
+                                      <a 
+                                        href={item.naverUrl} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="text-amber-700 hover:text-amber-900 font-bold underline flex items-center gap-0.5 text-[10px]"
+                                        title="새 창으로 네이버 열기"
+                                      >
+                                        열기<ExternalLink size={8} />
+                                      </a>
+                                    </div>
                                   )}
                                 </div>
 
@@ -1229,15 +1252,25 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
                                     title="쿠팡 쇼핑 URL 붙여넣기"
                                   />
                                   {item.coupangUrl && (
-                                    <a 
-                                      href={item.coupangUrl} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer" 
-                                      className="text-blue-700 hover:text-blue-900 font-bold underline flex items-center gap-0.5 text-[10px]"
-                                      title="새 창으로 쿠팡 열기"
-                                    >
-                                      열기<ExternalLink size={8} />
-                                    </a>
+                                    <div className="flex items-center gap-1 border-l border-blue-200/80 pl-1 ml-0.5">
+                                      <button
+                                        onClick={() => handleCopyUrl(item.coupangUrl!, "쿠팡")}
+                                        className="text-blue-800 hover:text-blue-950 font-semibold flex items-center gap-0.5 text-[10px] bg-blue-100/70 hover:bg-blue-200/80 px-1 py-0.5 rounded transition-colors"
+                                        title="쿠팡 주소 복사하기"
+                                      >
+                                        <Copy size={9} />
+                                        <span>복사</span>
+                                      </button>
+                                      <a 
+                                        href={item.coupangUrl} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="text-blue-700 hover:text-blue-900 font-bold underline flex items-center gap-0.5 text-[10px]"
+                                        title="새 창으로 쿠팡 열기"
+                                      >
+                                        열기<ExternalLink size={8} />
+                                      </a>
+                                    </div>
                                   )}
                                 </div>
 
