@@ -1164,35 +1164,87 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
                                 className="font-medium text-slate-900 w-full bg-transparent outline-none border-b border-transparent hover:border-slate-300 focus:border-amber-500 transition-colors cursor-text"
                                 title="클릭해서 품목 이름 수정"
                               />
-                              <div className="flex gap-2 mt-0.5 transition-opacity items-center">
-                                {item.naverUrl && (
-                                  <a 
-                                    href={item.naverUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
-                                  >
-                                    네이버 쇼핑 <ExternalLink size={8} />
-                                  </a>
-                                )}
-                                {item.coupangUrl && (
-                                  <a 
-                                    href={item.coupangUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="text-[10px] text-blue-600 hover:underline flex items-center gap-0.5"
-                                  >
-                                    쿠팡 바로가기 <ExternalLink size={8} />
-                                  </a>
-                                )}
+                              {/* Direct Links Paste Inputs */}
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 mt-1 text-[11px]" onClick={(e) => e.stopPropagation()}>
+                                
+                                {/* Naver Link Input */}
+                                <div className="flex items-center gap-1 bg-amber-50/80 px-1.5 py-0.5 rounded border border-amber-200/70">
+                                  <span className="text-[10px] font-bold text-amber-800 whitespace-nowrap">네이버</span>
+                                  <input
+                                    key={`naver-url-${item.id}-${item.naverUrl || ''}`}
+                                    type="url"
+                                    defaultValue={item.naverUrl || ''}
+                                    placeholder="주소 붙여넣기..."
+                                    onBlur={(e) => {
+                                      const newUrl = e.target.value.trim();
+                                      if (newUrl !== (item.naverUrl || '')) {
+                                        const updatedProducts = products.map(p => p.id === item.id ? { ...p, naverUrl: newUrl } : p);
+                                        saveToLocalStorage(updatedProducts, priceLogs);
+                                        showToast("네이버 주소가 업데이트되었습니다.");
+                                      }
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                                        e.currentTarget.blur();
+                                      }
+                                    }}
+                                    className="text-[10px] bg-transparent text-amber-950 placeholder-amber-400 outline-none w-28 sm:w-36 transition-colors"
+                                    title="네이버 쇼핑 URL 붙여넣기"
+                                  />
+                                  {item.naverUrl && (
+                                    <a 
+                                      href={item.naverUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="text-amber-700 hover:text-amber-900 font-bold underline flex items-center gap-0.5 text-[10px]"
+                                      title="새 창으로 네이버 열기"
+                                    >
+                                      열기<ExternalLink size={8} />
+                                    </a>
+                                  )}
+                                </div>
+
+                                {/* Coupang Link Input */}
+                                <div className="flex items-center gap-1 bg-blue-50/80 px-1.5 py-0.5 rounded border border-blue-200/70">
+                                  <span className="text-[10px] font-bold text-blue-800 whitespace-nowrap">쿠팡</span>
+                                  <input
+                                    key={`coupang-url-${item.id}-${item.coupangUrl || ''}`}
+                                    type="url"
+                                    defaultValue={item.coupangUrl || ''}
+                                    placeholder="주소 붙여넣기..."
+                                    onBlur={(e) => {
+                                      const newUrl = e.target.value.trim();
+                                      if (newUrl !== (item.coupangUrl || '')) {
+                                        const updatedProducts = products.map(p => p.id === item.id ? { ...p, coupangUrl: newUrl } : p);
+                                        saveToLocalStorage(updatedProducts, priceLogs);
+                                        showToast("쿠팡 주소가 업데이트되었습니다.");
+                                      }
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                                        e.currentTarget.blur();
+                                      }
+                                    }}
+                                    className="text-[10px] bg-transparent text-blue-950 placeholder-blue-400 outline-none w-28 sm:w-36 transition-colors"
+                                    title="쿠팡 쇼핑 URL 붙여넣기"
+                                  />
+                                  {item.coupangUrl && (
+                                    <a 
+                                      href={item.coupangUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="text-blue-700 hover:text-blue-900 font-bold underline flex items-center gap-0.5 text-[10px]"
+                                      title="새 창으로 쿠팡 열기"
+                                    >
+                                      열기<ExternalLink size={8} />
+                                    </a>
+                                  )}
+                                </div>
+
+                                {/* Delete Button */}
                                 <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteProduct(item.id);
-                                  }}
-                                  className="text-[10px] text-rose-500 hover:text-rose-700 flex items-center gap-0.5 ml-auto mr-2 font-semibold"
+                                  onClick={() => handleDeleteProduct(item.id)}
+                                  className="text-[10px] text-rose-500 hover:text-rose-700 flex items-center gap-0.5 font-semibold ml-auto"
                                   title="이 품목 삭제하기"
                                 >
                                   <Trash2 size={10} /> 삭제
@@ -2211,11 +2263,54 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
                               className="text-xs font-semibold text-slate-900 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-amber-500 outline-none w-full max-w-[200px] transition-colors"
                               title="클릭해서 품목 이름 수정"
                             />
-                            <div className="flex gap-2.5 mt-0.5 text-[10px] text-slate-400">
-                              <span>네이버 URL: {p.naverUrl ? "등록됨" : "미등록"}</span>
-                              <span>•</span>
-                              <span>쿠팡 URL: {p.coupangUrl ? "등록됨" : "미등록"}</span>
-                            </div>
+                             <div className="flex flex-wrap gap-2 mt-1 text-[10px]">
+                               <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                                 <span className="font-bold text-amber-800">네이버</span>
+                                 <input
+                                   key={`modal-naver-${p.id}-${p.naverUrl || ''}`}
+                                   type="url"
+                                   defaultValue={p.naverUrl || ''}
+                                   placeholder="주소 붙여넣기..."
+                                   onBlur={(e) => {
+                                     const newUrl = e.target.value.trim();
+                                     if (newUrl !== (p.naverUrl || '')) {
+                                       const updatedProducts = products.map(item => item.id === p.id ? { ...item, naverUrl: newUrl } : item);
+                                       saveToLocalStorage(updatedProducts, priceLogs);
+                                       showToast("네이버 주소가 업데이트되었습니다.");
+                                     }
+                                   }}
+                                   onKeyDown={(e) => {
+                                     if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                                       e.currentTarget.blur();
+                                     }
+                                   }}
+                                   className="bg-transparent text-amber-950 outline-none w-28 sm:w-36 text-[10px]"
+                                 />
+                               </div>
+                               <div className="flex items-center gap-1 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                                 <span className="font-bold text-blue-800">쿠팡</span>
+                                 <input
+                                   key={`modal-coupang-${p.id}-${p.coupangUrl || ''}`}
+                                   type="url"
+                                   defaultValue={p.coupangUrl || ''}
+                                   placeholder="주소 붙여넣기..."
+                                   onBlur={(e) => {
+                                     const newUrl = e.target.value.trim();
+                                     if (newUrl !== (p.coupangUrl || '')) {
+                                       const updatedProducts = products.map(item => item.id === p.id ? { ...item, coupangUrl: newUrl } : item);
+                                       saveToLocalStorage(updatedProducts, priceLogs);
+                                       showToast("쿠팡 주소가 업데이트되었습니다.");
+                                     }
+                                   }}
+                                   onKeyDown={(e) => {
+                                     if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                                       e.currentTarget.blur();
+                                     }
+                                   }}
+                                   className="bg-transparent text-blue-950 outline-none w-28 sm:w-36 text-[10px]"
+                                 />
+                               </div>
+                             </div>
                           </div>
                         </div>
                         <button
