@@ -3,7 +3,7 @@ import {
   Search, Plus, Trash2, Edit2, Sparkles, LineChart as ChartIcon, 
   Calendar, ArrowUpDown, TrendingDown, TrendingUp, CheckCircle, 
   ExternalLink, FileSpreadsheet, Download, Upload, Info, AlertTriangle, 
-  RefreshCw, Layers, Check, X, HelpCircle
+  RefreshCw, Layers, Check, X, HelpCircle, ChevronUp, ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -785,6 +785,22 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
     }
   };
 
+  // Move product up/down in the list
+  const handleMoveProduct = (productId: string, direction: 'up' | 'down') => {
+    const index = products.findIndex((p) => p.id === productId);
+    if (index === -1) return;
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= products.length) return;
+
+    const updatedProducts = [...products];
+    const temp = updatedProducts[index];
+    updatedProducts[index] = updatedProducts[targetIndex];
+    updatedProducts[targetIndex] = temp;
+
+    saveToLocalStorage(updatedProducts, priceLogs);
+    showToast("품목 순서가 변경되었습니다.");
+  };
+
   // Export database as JSON
   const handleExportData = () => {
     const dataStr = JSON.stringify({ products, priceLogs }, null, 2);
@@ -882,7 +898,7 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
 
       {/* Header */}
       <header className="bg-slate-900 text-white shadow-md border-b border-slate-800" id="main-header">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-[1750px] mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="bg-amber-500 text-slate-950 p-2.5 rounded-xl font-bold shadow-md flex items-center justify-center">
               <FileSpreadsheet size={24} className="text-slate-950" />
@@ -946,7 +962,7 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 w-full flex flex-col gap-6" id="main-content">
+      <main className="flex-1 max-w-[1750px] mx-auto px-4 py-6 sm:px-6 lg:px-8 w-full flex flex-col gap-6" id="main-content">
         
         {/* Statistics Widgets */}
         <section className="grid grid-cols-2 lg:grid-cols-5 gap-4" id="stats-section">
@@ -1052,8 +1068,8 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-50 text-slate-400 font-medium border-b border-slate-100 text-[11px] uppercase tracking-wider">
-                    <th className="py-2.5 px-3 text-center w-10">번호</th>
-                    <th className="py-2.5 px-3 min-w-[380px]">모니터링 품목</th>
+                    <th className="py-2.5 px-2 text-center w-16 whitespace-nowrap">순서/번호</th>
+                    <th className="py-2.5 px-3 min-w-[260px]">모니터링 품목</th>
                     <th className="py-2.5 px-3 text-right bg-amber-50/50 text-amber-900 border-l border-slate-100 font-bold">네이버 판매가</th>
                     <th className="py-2.5 px-3 text-right bg-amber-50/50 text-amber-900">배송비</th>
                     <th className="py-2.5 px-3 text-right bg-amber-100/60 text-amber-950 font-bold border-r border-slate-100" style={{ backgroundColor: "#FFF2CC" }}>네이버 합계</th>
@@ -1061,7 +1077,7 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
                     <th className="py-2.5 px-3 text-right bg-blue-50/50 text-blue-900 font-bold">쿠팡 판매가</th>
                     <th className="py-2.5 px-3 text-right bg-blue-50/50 text-blue-900">배송비</th>
                     <th className="py-2.5 px-3 text-right text-blue-950 font-bold border-r border-slate-100" style={{ backgroundColor: "#DDEBF7" }}>쿠팡 합계</th>
-                    <th className="py-2.5 px-3 text-right font-bold w-24">차액</th>
+                    <th className="py-2.5 px-3 text-right font-bold w-24 whitespace-nowrap">차액</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1098,9 +1114,29 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
                             }`}
                             id={`row-${item.id}`}
                           >
-                            {/* Number */}
-                            <td className="py-3 px-3 text-center text-xs text-slate-400 group-hover:text-slate-600">
-                              {idx + 1}
+                            {/* Number & Order Up/Down */}
+                            <td className="py-2.5 px-2 text-center text-xs text-slate-400">
+                              <div className="flex items-center justify-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                <div className="flex flex-col">
+                                  <button
+                                    onClick={() => handleMoveProduct(item.id, 'up')}
+                                    disabled={products.findIndex(p => p.id === item.id) === 0}
+                                    className="text-slate-400 hover:text-amber-600 disabled:opacity-20 disabled:hover:text-slate-400 transition-colors p-0.5"
+                                    title="위로 이동"
+                                  >
+                                    <ChevronUp size={13} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleMoveProduct(item.id, 'down')}
+                                    disabled={products.findIndex(p => p.id === item.id) === products.length - 1}
+                                    className="text-slate-400 hover:text-amber-600 disabled:opacity-20 disabled:hover:text-slate-400 transition-colors p-0.5"
+                                    title="아래로 이동"
+                                  >
+                                    <ChevronDown size={13} />
+                                  </button>
+                                </div>
+                                <span className="font-bold text-slate-600 text-xs w-4 text-center">{idx + 1}</span>
+                              </div>
                             </td>
                             
                             {/* Name */}
@@ -2132,8 +2168,26 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
                   <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 max-h-64 overflow-y-auto">
                     {products.map((p, idx) => (
                       <div key={p.id} className="p-3 bg-white flex items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs text-slate-400 w-5 text-center font-bold">{idx + 1}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-col">
+                            <button
+                              onClick={() => handleMoveProduct(p.id, 'up')}
+                              disabled={idx === 0}
+                              className="text-slate-400 hover:text-amber-600 disabled:opacity-20 disabled:hover:text-slate-400 transition-colors p-0.5"
+                              title="위로 이동"
+                            >
+                              <ChevronUp size={13} />
+                            </button>
+                            <button
+                              onClick={() => handleMoveProduct(p.id, 'down')}
+                              disabled={idx === products.length - 1}
+                              className="text-slate-400 hover:text-amber-600 disabled:opacity-20 disabled:hover:text-slate-400 transition-colors p-0.5"
+                              title="아래로 이동"
+                            >
+                              <ChevronDown size={13} />
+                            </button>
+                          </div>
+                          <span className="text-xs text-slate-500 w-5 text-center font-bold">{idx + 1}</span>
                           <div>
                             <input
                               key={`modal-name-${p.id}-${p.name}`}
