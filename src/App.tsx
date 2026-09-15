@@ -943,7 +943,7 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
 
       {/* Header */}
       <header className="bg-slate-900 text-white shadow-md border-b border-slate-800" id="main-header">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-[1700px] mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="bg-amber-500 text-slate-950 p-2.5 rounded-xl font-bold shadow-md flex items-center justify-center">
               <FileSpreadsheet size={24} className="text-slate-950" />
@@ -1007,7 +1007,7 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 w-full flex flex-col gap-6" id="main-content">
+      <main className="flex-1 max-w-[1700px] mx-auto px-4 py-6 sm:px-6 lg:px-8 w-full flex flex-col gap-6" id="main-content">
         
         {/* Statistics Widgets */}
         <section className="grid grid-cols-2 lg:grid-cols-5 gap-4" id="stats-section">
@@ -1113,8 +1113,8 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-50 text-slate-400 font-medium border-b border-slate-100 text-[11px] uppercase tracking-wider">
-                    <th className="py-2.5 px-3 text-center w-10">번호</th>
-                    <th className="py-2.5 px-3 min-w-[380px]">모니터링 품목</th>
+                    <th className="py-2.5 px-2 text-center w-8">번호</th>
+                    <th className="py-2.5 px-3 min-w-[200px]">모니터링 품목</th>
                     <th className="py-2.5 px-3 text-right bg-amber-50/50 text-amber-900 border-l border-slate-100 font-bold">네이버 판매가</th>
                     <th className="py-2.5 px-3 text-right bg-amber-50/50 text-amber-900">배송비</th>
                     <th className="py-2.5 px-3 text-right bg-amber-100/60 text-amber-950 font-bold border-r border-slate-100" style={{ backgroundColor: "#FFF2CC" }}>네이버 합계</th>
