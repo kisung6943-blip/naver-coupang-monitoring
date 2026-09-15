@@ -181,6 +181,8 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
   const [newProductName, setNewProductName] = useState<string>("");
   const [newProductNaverUrl, setNewProductNaverUrl] = useState<string>("");
   const [newProductCoupangUrl, setNewProductCoupangUrl] = useState<string>("");
+  const [editingNaverUrlProductId, setEditingNaverUrlProductId] = useState<string | null>(null);
+  const [editingCoupangUrlProductId, setEditingCoupangUrlProductId] = useState<string | null>(null);
   
   // Toast notifications
   const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
@@ -1187,35 +1189,169 @@ Return ONLY a valid JSON string (no markdown formatting, no \`\`\`json) with exa
                                 className="font-medium text-slate-900 w-full bg-transparent outline-none border-b border-transparent hover:border-slate-300 focus:border-amber-500 transition-colors cursor-text"
                                 title="클릭해서 품목 이름 수정"
                               />
-                              <div className="flex gap-2 mt-0.5 transition-opacity items-center">
-                                {item.naverUrl && (
-                                  <a 
-                                    href={item.naverUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
+                              <div className="flex gap-1.5 mt-1 transition-opacity items-center flex-wrap">
+                                {/* Naver Link & Copy */}
+                                {editingNaverUrlProductId === item.id ? (
+                                  <input
+                                    type="text"
+                                    defaultValue={item.naverUrl || ""}
+                                    placeholder="네이버 쇼핑 URL 입력 후 Enter"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
-                                  >
-                                    네이버 쇼핑 <ExternalLink size={8} />
-                                  </a>
+                                    onBlur={(e) => {
+                                      const newUrl = e.target.value.trim();
+                                      if (newUrl !== (item.naverUrl || "")) {
+                                        const updatedProducts = products.map(p => 
+                                          p.id === item.id ? { ...p, naverUrl: newUrl || undefined } : p
+                                        );
+                                        saveToLocalStorage(updatedProducts, priceLogs, true);
+                                        showToast("네이버 쇼핑 링크가 수정되었습니다.");
+                                      }
+                                      setEditingNaverUrlProductId(null);
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        e.currentTarget.blur();
+                                      } else if (e.key === 'Escape') {
+                                        setEditingNaverUrlProductId(null);
+                                      }
+                                    }}
+                                    className="text-[10px] px-1.5 py-0.5 rounded border border-amber-400 outline-none w-48 text-slate-800 font-normal bg-white shadow-xs"
+                                    autoFocus
+                                  />
+                                ) : (
+                                  <>
+                                    {item.naverUrl ? (
+                                      <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/80">
+                                        <a 
+                                          href={item.naverUrl} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="text-[10px] text-amber-700 hover:underline flex items-center gap-0.5 font-medium"
+                                        >
+                                          네이버 쇼핑 <ExternalLink size={8} />
+                                        </a>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(item.naverUrl!);
+                                            showToast("네이버 쇼핑 링크 주소가 복사되었습니다!");
+                                          }}
+                                          className="text-[9px] bg-white hover:bg-amber-100 border border-amber-300 text-amber-900 font-bold px-1.5 py-0.2 rounded transition-colors shadow-2xs cursor-pointer"
+                                          title="네이버 쇼핑 URL 주소 복사"
+                                        >
+                                          📋 복사
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingNaverUrlProductId(item.id);
+                                          }}
+                                          className="text-slate-400 hover:text-amber-600 p-0.5"
+                                          title="네이버 쇼핑 링크 수정"
+                                        >
+                                          <Edit2 size={8} />
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEditingNaverUrlProductId(item.id);
+                                        }}
+                                        className="text-[10px] text-slate-400 hover:text-amber-600 flex items-center gap-0.5 border border-dashed border-slate-300 hover:border-amber-400 px-1.5 py-0.5 rounded"
+                                        title="네이버 쇼핑 링크 등록"
+                                      >
+                                        <Plus size={8} /> 네이버 주소 등록
+                                      </button>
+                                    )}
+                                  </>
                                 )}
-                                {item.coupangUrl && (
-                                  <a 
-                                    href={item.coupangUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
+
+                                {/* Coupang Link & Copy */}
+                                {editingCoupangUrlProductId === item.id ? (
+                                  <input
+                                    type="text"
+                                    defaultValue={item.coupangUrl || ""}
+                                    placeholder="쿠팡 상품 URL 입력 후 Enter"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="text-[10px] text-blue-600 hover:underline flex items-center gap-0.5"
-                                  >
-                                    쿠팡 바로가기 <ExternalLink size={8} />
-                                  </a>
+                                    onBlur={(e) => {
+                                      const newUrl = e.target.value.trim();
+                                      if (newUrl !== (item.coupangUrl || "")) {
+                                        const updatedProducts = products.map(p => 
+                                          p.id === item.id ? { ...p, coupangUrl: newUrl || undefined } : p
+                                        );
+                                        saveToLocalStorage(updatedProducts, priceLogs, true);
+                                        showToast("쿠팡 링크가 수정되었습니다.");
+                                      }
+                                      setEditingCoupangUrlProductId(null);
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        e.currentTarget.blur();
+                                      } else if (e.key === 'Escape') {
+                                        setEditingCoupangUrlProductId(null);
+                                      }
+                                    }}
+                                    className="text-[10px] px-1.5 py-0.5 rounded border border-blue-400 outline-none w-48 text-slate-800 font-normal bg-white shadow-xs"
+                                    autoFocus
+                                  />
+                                ) : (
+                                  <>
+                                    {item.coupangUrl ? (
+                                      <div className="flex items-center gap-1 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/80">
+                                        <a 
+                                          href={item.coupangUrl} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="text-[10px] text-blue-700 hover:underline flex items-center gap-0.5 font-medium"
+                                        >
+                                          쿠팡 바로가기 <ExternalLink size={8} />
+                                        </a>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(item.coupangUrl!);
+                                            showToast("쿠팡 링크 주소가 복사되었습니다!");
+                                          }}
+                                          className="text-[9px] bg-white hover:bg-blue-100 border border-blue-300 text-blue-900 font-bold px-1.5 py-0.2 rounded transition-colors shadow-2xs cursor-pointer"
+                                          title="쿠팡 URL 주소 복사"
+                                        >
+                                          📋 복사
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingCoupangUrlProductId(item.id);
+                                          }}
+                                          className="text-slate-400 hover:text-blue-600 p-0.5"
+                                          title="쿠팡 링크 수정"
+                                        >
+                                          <Edit2 size={8} />
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEditingCoupangUrlProductId(item.id);
+                                        }}
+                                        className="text-[10px] text-slate-400 hover:text-blue-600 flex items-center gap-0.5 border border-dashed border-slate-300 hover:border-blue-400 px-1.5 py-0.5 rounded"
+                                        title="쿠팡 링크 등록"
+                                      >
+                                        <Plus size={8} /> 쿠팡 주소 등록
+                                      </button>
+                                    )}
+                                  </>
                                 )}
+
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleDeleteProduct(item.id);
                                   }}
-                                  className="text-[10px] text-rose-500 hover:text-rose-700 flex items-center gap-0.5 ml-auto mr-2 font-semibold"
+                                  className="text-[10px] text-rose-500 hover:text-rose-700 flex items-center gap-0.5 ml-auto mr-1 font-semibold"
                                   title="이 품목 삭제하기"
                                 >
                                   <Trash2 size={10} /> 삭제
